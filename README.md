@@ -1,6 +1,6 @@
 # Linkect MCP Server
 
-An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that exposes [Linkect](https://linkect.app) scheduling data as Claude tools.
+An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that exposes [Linkect](https://linkect.com) scheduling data as Claude tools.
 
 Ask Claude questions like:
 - _"¿Qué turnos tengo mañana?"_
