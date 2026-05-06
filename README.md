@@ -100,6 +100,15 @@ Linkect Database (PostgreSQL via Supabase)
 npm run dev
 ```
 
+## Demo
+
+### Claude Desktop
+![Briefing del día via Claude Desktop](docs/demo-claude-desktop.png)
+
+### Web UI
+![Web UI mobile-first](docs/demo-ui.png)
+
+
 ## Security notes
 
 - The service role key bypasses Row Level Security — treat it like a database password

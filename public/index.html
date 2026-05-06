@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Linkect — MCP Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:       #0f1117;
+      --ink-2:     #3a3d4a;
+      --ink-3:     #7a7f8e;
+      --border:    #e4e6ec;
+      --surface:   #f8f9fb;
+      --white:     #ffffff;
+      --accent:    #2d6a4f;
+      --accent-lt: #d8eedf;
+      --amber:     #b45309;
+      --amber-lt:  #fef3c7;
+      --red:       #b91c1c;
+      --red-lt:    #fee2e2;
+      --radius:    12px;
+      --radius-sm: 8px;
+      --shadow:    0 1px 3px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+    }
+
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      color: var(--ink);
+      background: var(--surface);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.25rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem;
+      color: var(--ink);
+      letter-spacing: -.01em;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .logo-tag {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      margin-left: 2px;
+    }
+
+    /* ── Main layout ── */
+    main {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 4rem;
+    }
+
+    /* ── Workspace input ── */
+    .workspace-bar {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .workspace-bar label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: .5rem;
+    }
+
+    .input-row {
+      display: flex;
+      gap: .5rem;
+    }
+
+    .slug-input {
+      flex: 1;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0 .875rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      color: var(--ink);
+      background: var(--surface);
+      outline: none;
+      transition: border-color .15s;
+    }
+
+    .slug-input:focus { border-color: var(--accent); background: var(--white); }
+    .slug-input::placeholder { color: var(--ink-3); }
+
+    .btn {
+      height: 40px;
+      padding: 0 1.1rem;
+      border-radius: var(--radius-sm);
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--accent); color: var(--white); }
+    .btn-primary:hover { opacity: .88; }
+    .btn-ghost { background: var(--surface); color: var(--ink-2); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--border); }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: .25rem;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .tab {
+      flex: 1;
+      height: 36px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--ink-3);
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: var(--white);
+    }
+
+    .tab:not(.active):hover { background: var(--surface); color: var(--ink-2); }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      margin-bottom: 1rem;
+      animation: fadeUp .2s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      padding: 1rem 1.25rem .75rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: baseline;
+      gap: .75rem;
+    }
+
+    .card-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.05rem;
+      color: var(--ink);
+    }
+
+    .card-meta {
+      font-size: .78rem;
+      color: var(--ink-3);
+      margin-left: auto;
+    }
+
+    /* ── Appointment rows ── */
+    .appt-list { padding: .25rem 0; }
+
+    .appt-item {
+      padding: .875rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      gap: .5rem .75rem;
+      align-items: start;
+      transition: background .1s;
+    }
+
+    .appt-item:last-child { border-bottom: none; }
+    .appt-item:hover { background: var(--surface); }
+
+    .appt-time {
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--ink-2);
+      padding-top: 2px;
+      line-height: 1.3;
+    }
+
+    .appt-day {
+      font-size: .7rem;
+      color: var(--ink-3);
+    }
+
+    .appt-name {
+      font-size: .9rem;
+      font-weight: 500;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+
+    .appt-service {
+      font-size: .78rem;
+      color: var(--ink-3);
+      margin-top: 2px;
+    }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: .7rem;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .badge-green  { background: var(--accent-lt); color: var(--accent); }
+    .badge-amber  { background: var(--amber-lt);  color: var(--amber);  }
+    .badge-red    { background: var(--red-lt);     color: var(--red);    }
+    .badge-gray   { background: var(--surface);    color: var(--ink-3); border: 1px solid var(--border); }
+
+    /* ── Stats grid ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .75rem;
+      padding: 1rem 1.25rem;
+    }
+
+    .stat-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: .875rem 1rem;
+    }
+
+    .stat-label {
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: .35rem;
+    }
+
+    .stat-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .stat-sub {
+      font-size: .72rem;
+      color: var(--ink-3);
+      margin-top: .25rem;
+    }
+
+    /* ── Status breakdown ── */
+    .breakdown { padding: 0 1.25rem 1rem; }
+    .breakdown-title {
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: .5rem;
+    }
+    .breakdown-row {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .3rem 0;
+    }
+    .breakdown-bar-wrap {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .breakdown-bar { height: 100%; background: var(--accent); border-radius: 2px; transition: width .4s ease; }
+    .breakdown-label { font-size: .75rem; color: var(--ink-2); min-width: 140px; }
+    .breakdown-count { font-size: .75rem; font-weight: 500; color: var(--ink-3); min-width: 20px; text-align: right; }
+
+    /* ── Briefing ── */
+    .briefing-section { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); }
+    .briefing-section:last-child { border-bottom: none; }
+    .briefing-section-title {
+      font-size: .72rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: .75rem;
+    }
+    .briefing-row {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .briefing-row:last-child { border-bottom: none; }
+    .briefing-time {
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--ink-2);
+      min-width: 44px;
+    }
+    .briefing-name { font-size: .875rem; color: var(--ink); flex: 1; }
+    .briefing-phone { font-size: .75rem; color: var(--ink-3); }
+
+    /* ── Patient ── */
+    .patient-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); }
+    .patient-name { font-family: 'DM Serif Display', serif; font-size: 1.25rem; margin-bottom: .25rem; }
+    .patient-meta { font-size: .8rem; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: .5rem; }
+    .patient-appt { padding: .875rem 1.25rem; border-bottom: 1px solid var(--border); }
+    .patient-appt:last-child { border-bottom: none; }
+    .patient-appt-date { font-size: .78rem; font-weight: 500; color: var(--ink-2); margin-bottom: .2rem; }
+    .patient-appt-service { font-size: .85rem; color: var(--ink); }
+    .patient-appt-meta { font-size: .75rem; color: var(--ink-3); margin-top: .15rem; }
+    .patient-intake { font-size: .78rem; color: var(--ink-2); margin-top: .35rem; font-style: italic; }
+
+    /* ── Patient search ── */
+    .patient-search { padding: .75rem 1.25rem; border-bottom: 1px solid var(--border); }
+    .email-row { display: flex; gap: .5rem; }
+    .email-input {
+      flex: 1; height: 38px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 0 .875rem; font-family: 'DM Sans', sans-serif; font-size: .875rem;
+      color: var(--ink); background: var(--surface); outline: none; transition: border-color .15s;
+    }
+    .email-input:focus { border-color: var(--accent); background: var(--white); }
+    .email-input::placeholder { color: var(--ink-3); }
+
+    /* ── Empty / error / loading states ── */
+    .state-msg {
+      padding: 2.5rem 1.25rem;
+      text-align: center;
+      color: var(--ink-3);
+      font-size: .875rem;
+      line-height: 1.6;
+    }
+
+    .state-msg .icon { font-size: 1.75rem; display: block; margin-bottom: .5rem; }
+
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Today highlight ── */
+    .today-chip {
+      display: inline-block;
+      font-size: .7rem;
+      font-weight: 500;
+      background: var(--accent);
+      color: var(--white);
+      border-radius: 4px;
+      padding: 1px 6px;
+      margin-bottom: .1rem;
+    }
+
+    /* ── Days selector ── */
+    .days-row {
+      display: flex;
+      gap: .25rem;
+      margin-top: .625rem;
+      flex-wrap: wrap;
+    }
+    .day-btn {
+      height: 28px; padding: 0 .75rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .75rem;
+      font-weight: 500;
+      color: var(--ink-3);
+      cursor: pointer;
+      transition: all .12s;
+    }
+    .day-btn.active { background: var(--accent-lt); color: var(--accent); border-color: var(--accent); }
+    .day-btn:hover:not(.active) { background: var(--border); color: var(--ink-2); }
+
+    @media (min-width: 480px) {
+      .appt-item { grid-template-columns: 72px 1fr auto; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Link<span>ect</span></div>
+  <span class="logo-tag">MCP</span>
+</header>
+
+<main>
+
+  <!-- Workspace bar -->
+  <div class="workspace-bar">
+    <label>Workspace</label>
+    <div class="input-row">
+      <input class="slug-input" id="slugInput" type="text" placeholder="ej: dra-garcia" autocomplete="off" spellcheck="false" />
+      <button class="btn btn-primary" id="loadBtn">Cargar</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-tab="briefing">Briefing</button>
+    <button class="tab" data-tab="appointments">Turnos</button>
+    <button class="tab" data-tab="stats">Stats</button>
+    <button class="tab" data-tab="patient">Paciente</button>
+  </div>
+
+  <!-- Content -->
+  <div id="content">
+    <div class="state-msg">
+      <span class="icon">🏥</span>
+      Ingresá el slug de tu workspace para comenzar.
+    </div>
+  </div>
+
+</main>
+
+<script>
+  let currentSlug = ''
+  let currentTab = 'briefing'
+  let daysAhead = 7
+
+  // ── Tab switching ──────────────────────────────────────────
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+      tab.classList.add('active')
+      currentTab = tab.dataset.tab
+      if (currentSlug) render()
+    })
+  })
+
+  // ── Load button ────────────────────────────────────────────
+  document.getElementById('loadBtn').addEventListener('click', load)
+  document.getElementById('slugInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') load()
+  })
+
+  function load() {
+    const slug = document.getElementById('slugInput').value.trim()
+    if (!slug) return
+    currentSlug = slug
+    render()
+  }
+
+  // ── Render dispatcher ──────────────────────────────────────
+  async function render() {
+    switch (currentTab) {
+      case 'briefing':     return renderBriefing()
+      case 'appointments': return renderAppointments()
+      case 'stats':        return renderStats()
+      case 'patient':      return renderPatientSearch()
+    }
+  }
+
+  // ── Fetch helper ───────────────────────────────────────────
+  async function apiFetch(path) {
+    const res = await fetch(path)
+    const json = await res.json()
+    if (!res.ok) throw new Error(json.error ?? 'Error del servidor')
+    return json
+  }
+
+  function setContent(html) {
+    document.getElementById('content').innerHTML = html
+  }
+
+  function loading() {
+    setContent(`<div class="state-msg"><span class="spinner"></span></div>`)
+  }
+
+  function errState(msg) {
+    setContent(`<div class="state-msg"><span class="icon">⚠️</span>${msg}</div>`)
+  }
+
+  // ── Status helpers ─────────────────────────────────────────
+  const statusLabel = {
+    confirmed: 'Confirmado',
+    pending_confirmation: 'Por confirmar',
+    pending_payment: 'Pago pendiente',
+    cancelled: 'Cancelado',
+    completed: 'Completado',
+    no_show: 'No asistió',
+    rescheduled: 'Reprogramado',
+    expired: 'Vencido',
+  }
+
+  function paymentBadge(payment) {
+    if (!payment) return `<span class="badge badge-gray">Sin pago</span>`
+    if (payment.status === 'approved') return `<span class="badge badge-green">✓ Pagado</span>`
+    return `<span class="badge badge-amber">⏳ Pendiente</span>`
+  }
+
+  function statusBadge(status) {
+    const cls = {
+      confirmed: 'badge-green',
+      pending_confirmation: 'badge-amber',
+      completed: 'badge-green',
+      cancelled: 'badge-red',
+      no_show: 'badge-red',
+    }[status] ?? 'badge-gray'
+    return `<span class="badge ${cls}">${statusLabel[status] ?? status}</span>`
+  }
+
+  // ── Briefing ───────────────────────────────────────────────
+  async function renderBriefing() {
+    loading()
+    try {
+      const d = await apiFetch(`/api/briefing?slug=${currentSlug}`)
+
+      let todayHtml = ''
+      if (d.today.length === 0) {
+        todayHtml = `<p style="font-size:.85rem;color:var(--ink-3);padding:.5rem 0">Sin turnos para hoy.</p>`
+      } else {
+        todayHtml = d.today.map(a => `
+          <div class="briefing-row">
+            <span class="briefing-time">${a.time}</span>
+            <span class="briefing-name">${a.patient}</span>
+            ${a.paid
+              ? `<span class="badge badge-green">✓</span>`
+              : `<span class="badge badge-amber">⏳</span>`}
+          </div>`).join('')
+      }
+
+      let tomorrowHtml = ''
+      if (d.tomorrow.length === 0) {
+        tomorrowHtml = `<p style="font-size:.85rem;color:var(--ink-3);padding:.5rem 0">Sin turnos para mañana.</p>`
+      } else {
+        tomorrowHtml = d.tomorrow.map(a => `
+          <div class="briefing-row">
+            <span class="briefing-time">${a.time}</span>
+            <span class="briefing-name">${a.patient}</span>
+          </div>`).join('')
+      }
+
+      const pendingAlert = d.pendingPaymentCount > 0
+        ? `<div style="margin-bottom:.75rem">
+            <span class="badge badge-amber">⚠️ ${d.pendingPaymentCount} turno(s) con pago pendiente hoy</span>
+           </div>`
+        : ''
+
+      setContent(`
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Briefing del día</span>
+            <span class="card-meta">${d.date}</span>
+          </div>
+          ${pendingAlert ? `<div class="briefing-section">${pendingAlert}</div>` : ''}
+          <div class="briefing-section">
+            <div class="briefing-section-title">Hoy — ${d.today.length} turno(s)</div>
+            ${todayHtml}
+          </div>
+          <div class="briefing-section">
+            <div class="briefing-section-title">Mañana — ${d.tomorrow.length} turno(s)</div>
+            ${tomorrowHtml}
+          </div>
+        </div>`)
+    } catch (e) { errState(e.message) }
+  }
+
+  // ── Appointments ───────────────────────────────────────────
+  async function renderAppointments() {
+    loading()
+    try {
+      const d = await apiFetch(`/api/appointments?slug=${currentSlug}&days=${daysAhead}`)
+
+      const daysBtns = [3, 7, 14, 30].map(n =>
+        `<button class="day-btn ${n === daysAhead ? 'active' : ''}" data-days="${n}">${n} días</button>`
+      ).join('')
+
+      let listHtml = ''
+      if (d.appointments.length === 0) {
+        listHtml = `<div class="state-msg"><span class="icon">📅</span>Sin turnos en los próximos ${daysAhead} días.</div>`
+      } else {
+        listHtml = `<div class="appt-list">${d.appointments.map(a => `
+          <div class="appt-item">
+            <div>
+              ${a.dayLabel === 'Hoy' ? `<span class="today-chip">Hoy</span>` : `<div class="appt-day">${a.dayLabel}</div>`}
+              <div class="appt-time">${a.time.split('–')[0].trim()}</div>
+            </div>
+            <div>
+              <div class="appt-name">${a.patient.name}</div>
+              <div class="appt-service">${a.service}</div>
+            </div>
+            <div>${paymentBadge(a.payment)}</div>
+          </div>`).join('')}
+        </div>`
+      }
+
+      setContent(`
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Próximos turnos</span>
+            <span class="card-meta">${d.total} total</span>
+          </div>
+          <div style="padding:.75rem 1.25rem;border-bottom:1px solid var(--border)">
+            <div class="days-row" id="daysRow">${daysBtns}</div>
+          </div>
+          ${listHtml}
+        </div>`)
+
+      document.getElementById('daysRow').addEventListener('click', e => {
+        const btn = e.target.closest('.day-btn')
+        if (!btn) return
+        daysAhead = Number(btn.dataset.days)
+        renderAppointments()
+      })
+    } catch (e) { errState(e.message) }
+  }
+
+  // ── Stats ──────────────────────────────────────────────────
+  async function renderStats() {
+    loading()
+    try {
+      const d = await apiFetch(`/api/stats?slug=${currentSlug}`)
+      const total = Object.values(d.statusBreakdown).reduce((a, b) => a + b, 0) || 1
+
+      const breakdownHtml = Object.entries(d.statusBreakdown)
+        .sort(([,a],[,b]) => b - a)
+        .map(([status, count]) => `
+          <div class="breakdown-row">
+            <span class="breakdown-label">${statusLabel[status] ?? status}</span>
+            <div class="breakdown-bar-wrap">
+              <div class="breakdown-bar" style="width:${Math.round(count/total*100)}%"></div>
+            </div>
+            <span class="breakdown-count">${count}</span>
+          </div>`).join('')
+
+      const revenue = Number(d.revenueThirtyDays).toLocaleString('es-AR', { minimumFractionDigits: 0 })
+
+      setContent(`
+        <div class="card">
+          <div class="card-header"><span class="card-title">Stats — ${d.workspace}</span></div>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-label">Pacientes</div>
+              <div class="stat-value">${d.totalPatients}</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">Turnos</div>
+              <div class="stat-value">${d.totalAppointments}</div>
+            </div>
+            <div class="stat-item" style="grid-column:1/-1">
+              <div class="stat-label">Revenue últimos 30 días</div>
+              <div class="stat-value" style="font-size:1.4rem">${revenue} ${d.currency}</div>
+            </div>
+          </div>
+          <div class="breakdown">
+            <div class="breakdown-title">Por estado</div>
+            ${breakdownHtml || '<p style="font-size:.85rem;color:var(--ink-3)">Sin datos.</p>'}
+          </div>
+        </div>`)
+    } catch (e) { errState(e.message) }
+  }
+
+  // ── Patient ────────────────────────────────────────────────
+  function renderPatientSearch() {
+    setContent(`
+      <div class="card">
+        <div class="card-header"><span class="card-title">Buscar paciente</span></div>
+        <div class="patient-search">
+          <div class="email-row">
+            <input class="email-input" id="emailInput" type="email" placeholder="email@ejemplo.com" />
+            <button class="btn btn-primary" id="searchBtn">Buscar</button>
+          </div>
+        </div>
+        <div id="patientResult">
+          <div class="state-msg">Ingresá el email del paciente.</div>
+        </div>
+      </div>`)
+
+    document.getElementById('searchBtn').addEventListener('click', searchPatient)
+    document.getElementById('emailInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') searchPatient()
+    })
+  }
+
+  async function searchPatient() {
+    const email = document.getElementById('emailInput').value.trim()
+    if (!email) return
+    document.getElementById('patientResult').innerHTML = `<div class="state-msg"><span class="spinner"></span></div>`
+    try {
+      const d = await apiFetch(`/api/patient?slug=${currentSlug}&email=${encodeURIComponent(email)}`)
+      const since = new Date(d.patient.memberSince).toLocaleDateString('es-AR', { year: 'numeric', month: 'long' })
+
+      const apptsHtml = d.appointments.length === 0
+        ? `<div class="state-msg">Sin historial de turnos.</div>`
+        : d.appointments.map(a => `
+            <div class="patient-appt">
+              <div class="patient-appt-date">${a.date}</div>
+              <div class="patient-appt-service">${a.service} · ${statusBadge(a.status)}</div>
+              ${a.payment ? `<div class="patient-appt-meta">${a.payment.amount} ${a.payment.currency} · ${a.payment.status}</div>` : ''}
+              ${a.intake?.goal ? `<div class="patient-intake">🎯 ${a.intake.goal}</div>` : ''}
+              ${a.intake?.notes ? `<div class="patient-intake">📝 ${a.intake.notes}</div>` : ''}
+            </div>`).join('')
+
+      document.getElementById('patientResult').innerHTML = `
+        <div class="patient-header">
+          <div class="patient-name">${d.patient.name}</div>
+          <div class="patient-meta">
+            <span>${d.patient.email}</span>
+            ${d.patient.phone ? `<span>📱 ${d.patient.phone}</span>` : ''}
+            <span>Desde ${since}</span>
+          </div>
+        </div>
+        ${apptsHtml}`
+    } catch (e) {
+      document.getElementById('patientResult').innerHTML = `<div class="state-msg">⚠️ ${e.message}</div>`
+    }
+  }
+</script>
+</body>
+</html>
